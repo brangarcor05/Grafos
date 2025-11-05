@@ -26,8 +26,9 @@ $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Limpiar archivos compilados
-clean:
+clear:
 	rm -f $(OBJECTS) $(TARGET)
+
 
 # Limpiar y recompilar
 rebuild: clean all
@@ -37,4 +38,4 @@ run: $(TARGET)
 	./$(TARGET)
 
 # Reglas que no son archivos
-.PHONY: all clean rebuild run
+.PHONY: all clean clear rebuild run
