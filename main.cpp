@@ -8,7 +8,7 @@ using namespace std;
 
 int main() {
     // Nombre de archivos de entrada y salida
-    string archivoEntrada = "test_input1.txt";
+    string archivoEntrada = "test_input2.txt";
     string archivoSalida = "salida.txt";
     
     ifstream entrada(archivoEntrada);
@@ -57,9 +57,11 @@ int main() {
                  << x << ", " << y << ")" << endl;
         }
         
-        // MOSTRAR MATRIZ DE DISTANCIAS
-        cout << "\n  > Calculando distancias euclidianas entre productos..." << endl;
-        grafo.mostrarMatrizDistancias();
+        // MOSTRAR MATRIZ DE DISTANCIAS (si hay pocos productos)
+        if (m <= 10) {
+            cout << "\n  > Calculando distancias euclidianas entre productos..." << endl;
+            grafo.mostrarMatrizDistancias();
+        }
         
         // Resolver el problema usando Prim + DFS
         cout << "  > Aplicando algoritmo de Prim..." << endl;
@@ -69,8 +71,10 @@ int main() {
         vector<Arista> mstGenerado;
         vector<Producto> rutaOptimizada = grafo.resolverEnrutamientoConMST(mstGenerado);
         
-        // MOSTRAR MST GENERADO
-        grafo.mostrarMST(mstGenerado);
+        // MOSTRAR MST GENERADO (si hay pocos productos)
+        if (m <= 10) {
+            grafo.mostrarMST(mstGenerado);
+        }
         
         cout << "  > Recorriendo MST con DFS..." << endl;
         cout << "  > Aplicando restriccion de capacidad..." << endl;
@@ -85,6 +89,32 @@ int main() {
              << distanciaTotal << " metros" << endl;
         cout << "  * Numero de viajes: " << ((m + k - 1) / k) << endl;
         cout << "  * Productos recogidos: " << m << "/" << m << endl;
+        
+        // DESGLOSE DE DISTANCIAS (solo si hay pocos productos)
+        if (m <= 10 && rutaOptimizada.size() > 0) {
+            cout << "\n  DESGLOSE DE DISTANCIAS:" << endl;
+            cout << "  ---------------------------------------------------------" << endl;
+            Producto posAnterior(0, 0, -1); // Inicia en base
+            double distanciaAcumulada = 0.0;
+            int segmento = 1;
+            
+            for (size_t i = 0; i < rutaOptimizada.size(); i++) {
+                const Producto& p = rutaOptimizada[i];
+                double distSegmento = posAnterior.distanciaA(p);
+                distanciaAcumulada += distSegmento;
+                
+                cout << "    Segmento " << segmento << ": ";
+                cout << "(" << fixed << setprecision(2) << posAnterior.x << "," << posAnterior.y << ")";
+                cout << " -> (" << p.x << "," << p.y << ")";
+                cout << " = " << distSegmento << " m";
+                cout << " [Acum: " << distanciaAcumulada << " m]" << endl;
+                
+                posAnterior = p;
+                segmento++;
+            }
+            cout << "  ---------------------------------------------------------" << endl;
+            cout << "  TOTAL: " << distanciaAcumulada << " metros\n" << endl;
+        }
         
         // Escribir resultado en archivo de salida
         salida << k << endl;

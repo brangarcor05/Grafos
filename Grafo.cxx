@@ -27,7 +27,14 @@ void Grafo::construirMatrizAdyacencia() {
 // ============================================
 std::vector<Arista> Grafo::algoritmoPrim() {
     int n = productos.size();
-    if (n == 0) return std::vector<Arista>();
+    if (n == 0) {
+        return std::vector<Arista>();
+    }
+    
+    if (n == 1) {
+        // Solo hay un producto, no hay árbol que construir
+        return std::vector<Arista>();
+    }
     
     std::vector<Arista> mst; // Árbol de expansión mínima resultante
     std::vector<bool> enMST(n, false); // Nodos ya incluidos en el MST
@@ -39,7 +46,7 @@ std::vector<Arista> Grafo::algoritmoPrim() {
     
     // Paso 2: Agregar todas las aristas del nodo inicial a la cola de prioridad
     for (int i = 0; i < n; i++) {
-        if (i != nodoInicial) {
+        if (i != nodoInicial && matrizAdyacencia.size() > 0) {
             pq.push(Arista(nodoInicial, i, matrizAdyacencia[nodoInicial][i]));
         }
     }
@@ -71,13 +78,19 @@ std::vector<Arista> Grafo::algoritmoPrim() {
 
 void Grafo::construirMSTListasAdyacencia(const std::vector<Arista>& mst) {
     int n = productos.size();
+    listasAdyacencia.clear();
     listasAdyacencia.assign(n, std::vector<int>());
     
     // Construir grafo no dirigido (árbol) desde el MST
     for (size_t i = 0; i < mst.size(); i++) {
         const Arista& arista = mst[i];
-        listasAdyacencia[arista.origen].push_back(arista.destino);
-        listasAdyacencia[arista.destino].push_back(arista.origen);
+        
+        // Verificar índices válidos
+        if (arista.origen >= 0 && arista.origen < n &&
+            arista.destino >= 0 && arista.destino < n) {
+            listasAdyacencia[arista.origen].push_back(arista.destino);
+            listasAdyacencia[arista.destino].push_back(arista.origen);
+        }
     }
 }
 
@@ -85,13 +98,25 @@ void Grafo::construirMSTListasAdyacencia(const std::vector<Arista>& mst) {
 // DFS - Recorrido en Profundidad del MST
 // ============================================
 void Grafo::dfsRecorrido(int nodo, std::vector<bool>& visitado, std::vector<int>& recorrido) {
+    // Verificar límites
+    if (nodo < 0 || nodo >= (int)productos.size()) {
+        return;
+    }
+    
+    if (nodo >= (int)visitado.size()) {
+        return;
+    }
+    
     visitado[nodo] = true;
     recorrido.push_back(nodo);
     
     // Visitar todos los vecinos en el MST
-    for (int vecino : listasAdyacencia[nodo]) {
-        if (!visitado[vecino]) {
-            dfsRecorrido(vecino, visitado, recorrido);
+    if (nodo < (int)listasAdyacencia.size()) {
+        for (size_t i = 0; i < listasAdyacencia[nodo].size(); i++) {
+            int vecino = listasAdyacencia[nodo][i];
+            if (vecino >= 0 && vecino < (int)visitado.size() && !visitado[vecino]) {
+                dfsRecorrido(vecino, visitado, recorrido);
+            }
         }
     }
 }
@@ -250,6 +275,12 @@ void Grafo::mostrarMatrizDistancias() {
     if (n == 0) {
         std::cout << "No hay productos en el grafo." << std::endl;
         return;
+    }
+    
+    // Verificar que la matriz esté construida
+    if (matrizAdyacencia.empty() || matrizAdyacencia.size() != (size_t)n) {
+        std::cout << "Construyendo matriz de adyacencia..." << std::endl;
+        construirMatrizAdyacencia();
     }
     
     std::cout << "\n=== MATRIZ DE DISTANCIAS (Grafo Completo) ===" << std::endl;
