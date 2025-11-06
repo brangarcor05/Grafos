@@ -139,53 +139,70 @@ int Grafo::nodoMasCercanoABase(const std::vector<bool>& visitado) {
 }
 
 // ============================================
-// RESOLVER ENRUTAMIENTO - Usando Prim + DFS
+// ALGORITMO DEL VECINO MÁS CERCANO POR VIAJES
 // ============================================
-std::vector<Producto> Grafo::resolverEnrutamiento() {
-    if (productos.empty()) {
-        return std::vector<Producto>();
-    }
+std::vector<Producto> Grafo::resolverEnrutamientoVecinoMasCercano() {
+    if (productos.empty()) return std::vector<Producto>();
     
-    // Paso 1: Construir matriz de adyacencia (grafo completo)
+    // 1. Construir MST
     construirMatrizAdyacencia();
-    
-    // Paso 2: Aplicar algoritmo de Prim para obtener MST
     std::vector<Arista> mst = algoritmoPrim();
-    
-    // Paso 3: Construir listas de adyacencia del MST
     construirMSTListasAdyacencia(mst);
     
-    // Paso 4: Realizar DFS sobre el MST para obtener orden de visita
-    std::vector<bool> visitadoDFS(productos.size(), false);
-    std::vector<int> ordenVisita;
-    
-    // Comenzar DFS desde el nodo más cercano a la base
-    int nodoInicial = nodoMasCercanoABase(visitadoDFS);
-    dfsRecorrido(nodoInicial, visitadoDFS, ordenVisita);
-    
-    // Paso 5: Construir ruta con restricción de capacidad
     std::vector<Producto> rutaFinal;
-    int productosEnViaje = 0;
+    std::vector<bool> visitados(productos.size(), false);
+    int pendientes = productos.size();
     
-    for (size_t i = 0; i < ordenVisita.size(); i++) {
-        int idx = ordenVisita[i];
+    rutaFinal.push_back(base); // Comenzar en base
+    
+    while (pendientes > 0) {
+        // Encontrar nodo más cercano a la base NO visitado
+        int nodoActual = -1;
+        double minDist = std::numeric_limits<double>::max();
         
-        // Si alcanzamos la capacidad, regresar a base
-        if (productosEnViaje == capacidad) {
-            rutaFinal.push_back(base);
-            productosEnViaje = 0;
+        for (int i = 0; i < productos.size(); i++) {
+            if (!visitados[i]) {
+                double dist = base.distanciaA(productos[i]);
+                if (dist < minDist) {
+                    minDist = dist;
+                    nodoActual = i;
+                }
+            }
         }
         
-        // Agregar producto a la ruta
-        rutaFinal.push_back(productos[idx]);
-        productosEnViaje++;
+        if (nodoActual == -1) break;
+        
+        // Hacer DFS desde este nodo para recoger k productos
+        std::vector<bool> visitadoLocal(productos.size(), false);
+        std::vector<int> recorrido;
+        dfsRecorrido(nodoActual, visitadoLocal, recorrido);
+        
+        // Agregar productos al recorrido (hasta completar k)
+        int productosEnViaje = 0;
+        for (int idx : recorrido) {
+            if (!visitados[idx] && productosEnViaje < capacidad) {
+                rutaFinal.push_back(productos[idx]);
+                visitados[idx] = true;
+                productosEnViaje++;
+                pendientes--;
+            }
+            if (productosEnViaje >= capacidad) break;
+        }
+        
+        // Regresar a base si quedan productos
+        if (pendientes > 0) {
+            rutaFinal.push_back(base);
+        }
     }
     
-    // Regreso final a la base
-    rutaFinal.push_back(base);
+    // Regreso final
+    if (rutaFinal.back().x != 0 || rutaFinal.back().y != 0) {
+        rutaFinal.push_back(base);
+    }
     
     return rutaFinal;
 }
+
 
 // Versión que retorna también el MST para visualización
 std::vector<Producto> Grafo::resolverEnrutamientoConMST(std::vector<Arista>& mstResultado) {
@@ -231,7 +248,7 @@ std::vector<Producto> Grafo::resolverEnrutamientoConMST(std::vector<Arista>& mst
     // Regreso final a la base
     rutaFinal.push_back(base);
     
-    return rutaFinal;
+    return resolverEnrutamientoVecinoMasCercano();
 }
 
 double Grafo::calcularDistanciaTotal(const std::vector<Producto>& ruta) {
