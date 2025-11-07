@@ -21,3 +21,6 @@ run2:
 
 run3:
 	./$(PROGRAM) test_input3.txt
+
+run4:
+	./$(PROGRAM) test_cases_complex.txt
