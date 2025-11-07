@@ -75,6 +75,8 @@ public:
     
     // Resuelve y retorna también el MST para visualización
     std::vector<Producto> resolverEnrutamientoConMST(std::vector<Arista>& mstResultado);
+
+    std::vector<Producto> resolverEnrutamientoVecinoMasCercano();
     
     // Calcula la distancia total de una ruta
     double calcularDistanciaTotal(const std::vector<Producto>& ruta);
