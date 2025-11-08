@@ -2,7 +2,7 @@
 #include <iostream>
 #include <iomanip>
 
-Grafo::Grafo(int k) : capacidad(k), base(0, 0, -1) {}
+Grafo::Grafo(int k) : base(0, 0, -1), capacidad(k) {}
 
 void Grafo::agregarProducto(double x, double y) {
     productos.push_back(Producto(x, y, productos.size()));
@@ -123,7 +123,7 @@ void Grafo::dfsRecorrido(int nodo, std::vector<bool>& visitado, std::vector<int>
 
 int Grafo::nodoMasCercanoABase(const std::vector<bool>& visitado) {
     double minDist = std::numeric_limits<double>::max();
-    int masCercano = 0;
+    int masCercano = -1;
     
     for (size_t i = 0; i < productos.size(); i++) {
         if (!visitado[i]) {
@@ -156,21 +156,11 @@ std::vector<Producto> Grafo::resolverEnrutamientoVecinoMasCercano() {
     rutaFinal.push_back(base); // Comenzar en base
     
     while (pendientes > 0) {
-        // Encontrar nodo más cercano a la base NO visitado
-        int nodoActual = -1;
-        double minDist = std::numeric_limits<double>::max();
+         while (pendientes > 0) {
         
-        for (int i = 0; i < productos.size(); i++) {
-            if (!visitados[i]) {
-                double dist = base.distanciaA(productos[i]);
-                if (dist < minDist) {
-                    minDist = dist;
-                    nodoActual = i;
-                }
-            }
-        }
+        int nodoActual = nodoMasCercanoABase(visitados);
         
-        if (nodoActual == -1) break;
+        if (nodoActual == -1) break;  // No hay más nodos por visitar
         
         // Hacer DFS desde este nodo para recoger k productos
         std::vector<bool> visitadoLocal(productos.size(), false);
@@ -198,6 +188,7 @@ std::vector<Producto> Grafo::resolverEnrutamientoVecinoMasCercano() {
     // Regreso final
     if (rutaFinal.back().x != 0 || rutaFinal.back().y != 0) {
         rutaFinal.push_back(base);
+        }
     }
     
     return rutaFinal;

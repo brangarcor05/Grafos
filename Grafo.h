@@ -73,9 +73,6 @@ public:
     // Resuelve el problema de enrutamiento usando Prim + DFS
     std::vector<Producto> resolverEnrutamiento();
     
-    // Resuelve y retorna también el MST para visualización
-   // std::vector<Producto> resolverEnrutamientoConMST(std::vector<Arista>& mstResultado);
-
     std::vector<Producto> resolverEnrutamientoVecinoMasCercano();
     
     // Calcula la distancia total de una ruta
@@ -86,12 +83,6 @@ public:
     
     // Limpia el grafo para un nuevo escenario
     void limpiar();
-    
-    // Muestra información del MST (para depuración)
-    //void mostrarMST(const std::vector<Arista>& mst);
-    
-    // Muestra la matriz de distancias completa
-    //void mostrarMatrizDistancias();
     
     // Obtiene un producto por índice
     Producto getProducto(int index) const { return productos[index]; }
