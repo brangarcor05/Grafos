@@ -74,7 +74,7 @@ public:
     std::vector<Producto> resolverEnrutamiento();
     
     // Resuelve y retorna también el MST para visualización
-    std::vector<Producto> resolverEnrutamientoConMST(std::vector<Arista>& mstResultado);
+   // std::vector<Producto> resolverEnrutamientoConMST(std::vector<Arista>& mstResultado);
 
     std::vector<Producto> resolverEnrutamientoVecinoMasCercano();
     
@@ -88,10 +88,10 @@ public:
     void limpiar();
     
     // Muestra información del MST (para depuración)
-    void mostrarMST(const std::vector<Arista>& mst);
+    //void mostrarMST(const std::vector<Arista>& mst);
     
     // Muestra la matriz de distancias completa
-    void mostrarMatrizDistancias();
+    //void mostrarMatrizDistancias();
     
     // Obtiene un producto por índice
     Producto getProducto(int index) const { return productos[index]; }
