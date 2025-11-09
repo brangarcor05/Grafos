@@ -25,7 +25,7 @@ void Grafo::construirMatrizAdyacencia() {
 // ============================================
 // ALGORITMO DE PRIM - Árbol de Expansión Mínima
 // ============================================
-std::vector<Arista> Grafo::algoritmoPrim() {
+/*std::vector<Arista> Grafo::algoritmoPrim() {
     int n = productos.size();
     if (n == 0) {
         return std::vector<Arista>();
@@ -75,8 +75,8 @@ std::vector<Arista> Grafo::algoritmoPrim() {
     
     return mst;
 }
-
-void Grafo::construirMSTListasAdyacencia(const std::vector<Arista>& mst) {
+*/
+/*void Grafo::construirMSTListasAdyacencia(const std::vector<Arista>& mst) {
     int n = productos.size();
     listasAdyacencia.clear();
     listasAdyacencia.assign(n, std::vector<int>());
@@ -93,11 +93,11 @@ void Grafo::construirMSTListasAdyacencia(const std::vector<Arista>& mst) {
         }
     }
 }
-
+*/
 // ============================================
 // DFS - Recorrido en Profundidad del MST
 // ============================================
-void Grafo::dfsRecorrido(int nodo, std::vector<bool>& visitado, std::vector<int>& recorrido) {
+/*void Grafo::dfsRecorrido(int nodo, std::vector<bool>& visitado, std::vector<int>& recorrido) {
     // Verificar límites
     if (nodo < 0 || nodo >= (int)productos.size()) {
         return;
@@ -119,7 +119,7 @@ void Grafo::dfsRecorrido(int nodo, std::vector<bool>& visitado, std::vector<int>
             }
         }
     }
-}
+}*/
 
 int Grafo::nodoMasCercanoABase(const std::vector<bool>& visitado) {
     double minDist = std::numeric_limits<double>::max();
@@ -142,57 +142,54 @@ int Grafo::nodoMasCercanoABase(const std::vector<bool>& visitado) {
 // ALGORITMO DEL VECINO MÁS CERCANO POR VIAJES
 // ============================================
 std::vector<Producto> Grafo::resolverEnrutamientoVecinoMasCercano() {
-    if (productos.empty()) return std::vector<Producto>();
-    
-    // 1. Construir MST
+    if (productos.empty()) return {};
+
     construirMatrizAdyacencia();
-    std::vector<Arista> mst = algoritmoPrim();
-    construirMSTListasAdyacencia(mst);
-    
     std::vector<Producto> rutaFinal;
     std::vector<bool> visitados(productos.size(), false);
     int pendientes = productos.size();
-    
-    rutaFinal.push_back(base); // Comenzar en base
-    
+
+    Producto actual = base;
+    rutaFinal.push_back(base);
+
     while (pendientes > 0) {
-         while (pendientes > 0) {
-        
-        int nodoActual = nodoMasCercanoABase(visitados);
-        
-        if (nodoActual == -1) break;  // No hay más nodos por visitar
-        
-        // Hacer DFS desde este nodo para recoger k productos
-        std::vector<bool> visitadoLocal(productos.size(), false);
-        std::vector<int> recorrido;
-        dfsRecorrido(nodoActual, visitadoLocal, recorrido);
-        
-        // Agregar productos al recorrido (hasta completar k)
         int productosEnViaje = 0;
-        for (int idx : recorrido) {
-            if (!visitados[idx] && productosEnViaje < capacidad) {
-                rutaFinal.push_back(productos[idx]);
-                visitados[idx] = true;
-                productosEnViaje++;
-                pendientes--;
+
+        while (productosEnViaje < capacidad && pendientes > 0) {
+            double menorDist = std::numeric_limits<double>::max();
+            int siguiente = -1;
+
+            // Buscar el producto más cercano no visitado
+            for (int i = 0; i < (int)productos.size(); ++i) {
+                if (!visitados[i]) {
+                    double dist = actual.distanciaA(productos[i]);
+                    if (dist < menorDist) {
+                        menorDist = dist;
+                        siguiente = i;
+                    }
+                }
             }
-            if (productosEnViaje >= capacidad) break;
+
+            // Si ya no hay productos alcanzables, termina el viaje
+            if (siguiente == -1) break;
+
+            // Moverse al producto más cercano
+            rutaFinal.push_back(productos[siguiente]);
+            visitados[siguiente] = true;
+            actual = productos[siguiente];
+            productosEnViaje++;
+            pendientes--;
         }
-        
-        // Regresar a base si quedan productos
-        if (pendientes > 0) {
-            rutaFinal.push_back(base);
-        }
-    }
-    
-    // Regreso final
-    if (rutaFinal.back().x != 0 || rutaFinal.back().y != 0) {
+
+        // Regresar a base al final del viaje
         rutaFinal.push_back(base);
-        }
+        actual = base;
     }
-    
+
     return rutaFinal;
 }
+
+
 
 double Grafo::calcularDistanciaTotal(const std::vector<Producto>& ruta) {
     if (ruta.empty()) return 0.0;
