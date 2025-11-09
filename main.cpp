@@ -58,11 +58,11 @@ int main(int argc, char* argv[]) {
     
     salida << n << endl;
     
-    cout << "\n+========================================================+" << endl;
-    cout << "|   ROBOT RECOLECTOR AUTONOMO - ALGORITMO DE PRIM       |" << endl;
-    cout << "+========================================================+" << endl;
+    cout << "\n" ;
+    cout << " ROBOT RECOLECTOR AUTONOMO " << endl;
     cout << "  Archivo de entrada: " << archivoEntrada << endl;
-    cout << "+========================================================+\n" << endl;
+    cout << "\n" ;
+
     
     for (int escenario = 0; escenario < n; escenario++) {
         int k; // Capacidad del robot
@@ -70,9 +70,7 @@ int main(int argc, char* argv[]) {
         
         entrada >> k >> m;
         
-        cout << "\n+--------------------------------------------------------+" << endl;
-        cout << "|  ESCENARIO " << (escenario + 1) << string(44, ' ') << "|" << endl;
-        cout << "+--------------------------------------------------------+" << endl;
+        cout << " ESCENARIO " << (escenario + 1) << endl;
         cout << "  Capacidad del robot (k): " << k << endl;
         cout << "  Número de productos (m): " << m << endl;
         
@@ -84,44 +82,29 @@ int main(int argc, char* argv[]) {
             double x, y;
             entrada >> x >> y;
             grafo.agregarProducto(x, y);
-         
         }
         
-       // vector<Arista> mstGenerado;
         vector<Producto> rutaOptimizada = grafo.resolverEnrutamientoVecinoMasCercano();
         
-        // Calcular distancia total
-        double distanciaTotal = grafo.calcularDistanciaTotal(rutaOptimizada);
-        
-        cout << "\n  +======================================================+" << endl;
-        cout << "  |  RESULTADOS                                          |" << endl;
-        cout << "  +======================================================+" << endl;
-        cout << "  * Distancia total: " << fixed << setprecision(2) 
-             << distanciaTotal << " metros" << endl;
+        cout << "  RESULTADOS " << endl;
         cout << "  * Numero de viajes: " << ((m + k - 1) / k) << endl;
         cout << "  * Productos recogidos: " << m << "/" << m << endl;
         
-       
         // Escribir resultado en archivo de salida
         salida << k << endl;
-        salida << rutaOptimizada.size() << endl;
+        salida << m << endl;
         
         for (size_t i = 0; i < rutaOptimizada.size(); i++) {
             const Producto& producto = rutaOptimizada[i];
-            salida << fixed << setprecision(2) << producto.x << " " << producto.y << endl;
+            salida << producto.x << " " << producto.y << endl;
         }
-        
-        
+        cout << "\n" ;
+    }
     
     entrada.close();
     salida.close();
     
     cout << "\n* Proceso completado exitosamente" << endl;
     cout << "* Resultados guardados en: " << archivoSalida << endl;
-    cout << "\n+========================================================+" << endl;
-    cout << "|  Algoritmo utilizado: PRIM + DFS + Restriccion Cap.   |" << endl;
-    cout << "+========================================================+\n" << endl;
-    
     return 0;
-    }
 }

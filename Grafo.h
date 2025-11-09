@@ -44,24 +44,12 @@ class Grafo {
 private:
     std::vector<Producto> productos;
     std::vector<std::vector<double>> matrizAdyacencia;
-    std::vector<std::vector<int>> listasAdyacencia; // Para el MST
     Producto base; // Base en (0,0)
     int capacidad; // Capacidad máxima k
     
     // Construye la matriz de adyacencia con todas las distancias
     void construirMatrizAdyacencia();
-    
-    // Algoritmo de Prim para construir MST
-    std::vector<Arista> algoritmoPrim();
-    
-    // Construye listas de adyacencia del MST
-    void construirMSTListasAdyacencia(const std::vector<Arista>& mst);
-    
-    // DFS para recorrer el MST
-    void dfsRecorrido(int nodo, std::vector<bool>& visitado, std::vector<int>& recorrido);
-    
-    // Encuentra el nodo más cercano a la base no visitado
-    int nodoMasCercanoABase(const std::vector<bool>& visitado);
+
     
 public:
     // Constructor
@@ -70,8 +58,6 @@ public:
     // Agrega un producto al grafo
     void agregarProducto(double x, double y);
     
-    // Resuelve el problema de enrutamiento usando Prim + DFS
-    std::vector<Producto> resolverEnrutamiento();
     
     std::vector<Producto> resolverEnrutamientoVecinoMasCercano();
     
